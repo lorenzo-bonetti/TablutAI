@@ -2,17 +2,15 @@ package it.unibo.ai.didattica.competition.tablut.client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import it.unibo.ai.didattica.competition.tablut.domain.*;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
+import static java.util.stream.Collectors.toMap;
+
 /**
- *
  * @author A. Piretti, Andrea Galassi
- *
  */
 public class TablutBasicClient extends TablutClient {
 
@@ -33,6 +31,22 @@ public class TablutBasicClient extends TablutClient {
 
     public TablutBasicClient(String player, int gameChosen) throws UnknownHostException, IOException {
         this(player, "random", gameChosen);
+    }
+
+    public int evaluation(State stateA, State stateB) {
+        int eval = 0;
+
+
+        //controlla numero pedine avversario
+        if (stateA.getNumberOf(State.Pawn.BLACK) > stateB.getNumberOf(State.Pawn.BLACK)) {
+            eval += 10;
+
+        }
+
+
+        return eval;
+
+
     }
 
     public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
@@ -130,6 +144,10 @@ public class TablutBasicClient extends TablutClient {
                                 System.out.println("KING");
                                 king[0] = i;
                                 king[1] = j;
+                                buf = new int[2];
+                                buf[0] = i;
+                                buf[1] = j;
+                                pawns.add(buf);
                             }
                             if (state.getPawn(i, j).equalsPawn(State.Pawn.WHITE.toString())) {
                                 System.out.println("WHITE");
@@ -146,25 +164,24 @@ public class TablutBasicClient extends TablutClient {
                         }
                     }
 
-                    BasicWhiteStrategy strategy = new BasicWhiteStrategy(state, king, pawns, empty, rules);
+                    //BasicWhiteStrategy strategy = new BasicWhiteStrategy(state, king, pawns, empty, rules);
+
+                    boolean found = false;
+                    Action a = null;
+                    try {
+                        a = new Action("z0", "z0", State.Turn.WHITE);
+                    } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
 
 
-                    Action a = strategy.getAction();
 
-
-
-/*                    while (!found) {
-                        if (pawns.size() > 1) {
-                            selected = pawns.get(new Random().nextInt(pawns.size() - 1));
-                        } else {
-                            selected = pawns.get(0);
-                        }
-
-                        String from = this.getCurrentState().getBox(selected[0], selected[1]);
-
-                        selected = empty.get(new Random().nextInt(empty.size() - 1));
-                        String to = this.getCurrentState().getBox(selected[0], selected[1]);
-
+                    int i = 0;
+                    while (i < empty.size() && !found) {
+                        String from = this.getCurrentState().getBox(king[0], king[1]);
+                        System.out.println("trying to move king from " + king[0] + ", " + king[1] + " type: " + state.getPawn(king[0], king[1]).toString());
+                        String to = this.getCurrentState().getBox(empty.get(i)[0], empty.get(i)[1]);
                         try {
                             a = new Action(from, to, State.Turn.WHITE);
                         } catch (IOException e1) {
@@ -173,13 +190,74 @@ public class TablutBasicClient extends TablutClient {
                         }
 
                         try {
-                            rules.checkMove(state, a);
-                            found = true;
+                            State possibleState = rules.checkMove(state.clone(), a);
+                            if (possibleState.getTurn().equalsTurn("WW")) {
+                                System.out.println("King can win!");
+                                rules.checkMove(state, a);
+                                found = true;
+
+                            }
                         } catch (Exception e) {
 
                         }
+                        System.out.println(i);
+                        i++;
+                    }
 
-                    }*/
+
+
+                    int[] selected = null;
+                    Map<Action, Integer> evalMoves = new HashMap<Action, Integer>();
+
+                    if (!found) {
+                        while (pawns.size() > 0) {
+                            if (pawns.size() > 1) {
+                                selected = pawns.remove(new Random().nextInt(pawns.size() - 1));
+                            } else {
+                                selected = pawns.remove(0);
+                            }
+
+
+                            String from = this.getCurrentState().getBox(selected[0], selected[1]);
+
+                            for (int k = 0; k < empty.size(); k++) {
+                                selected = empty.get(k);
+                                String to = this.getCurrentState().getBox(selected[0], selected[1]);
+
+                                try {
+                                    a = new Action(from, to, State.Turn.WHITE);
+                                } catch (IOException e1) {
+                                    // TODO Auto-generated catch block
+                                    e1.printStackTrace();
+                                }
+                                int score = 0;
+                                try {
+                                    State possibleState = rules.checkMove(state.clone(), a);
+                                    score = evaluation(state, possibleState);
+                                    evalMoves.put(a, score);
+                                } catch (Exception e) {
+
+                                }
+
+
+                            }
+
+
+                        }
+
+                        Map<Action, Integer> sorted = evalMoves
+                                .entrySet()
+                                .stream()
+                                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                                .collect(
+                                        toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                                                LinkedHashMap::new));
+
+                        a = sorted.entrySet().iterator().next().getKey();
+
+                        System.out.println("My move has evaluation = " + sorted.get(a));
+                    }
+
 
                     System.out.println("Mossa scelta: " + a.toString());
                     try {
@@ -272,9 +350,7 @@ public class TablutBasicClient extends TablutClient {
                     pawns.clear();
                     empty.clear();
 
-                }
-
-                else if (state.getTurn().equals(StateTablut.Turn.WHITE)) {
+                } else if (state.getTurn().equals(StateTablut.Turn.WHITE)) {
                     System.out.println("Waiting for your opponent move... ");
                 } else if (state.getTurn().equals(StateTablut.Turn.WHITEWIN)) {
                     System.out.println("YOU LOSE!");
