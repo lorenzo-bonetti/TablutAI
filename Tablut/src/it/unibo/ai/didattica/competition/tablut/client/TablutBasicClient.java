@@ -33,18 +33,44 @@ public class TablutBasicClient extends TablutClient {
         this(player, "random", gameChosen);
     }
 
-    public int evaluation(State stateA, State stateB) {
-        int eval = 0;
+    public int whiteEvaluation(State state) {
+        int utility = 0;
 
-
-        //controlla numero pedine avversario
-        if (stateA.getNumberOf(State.Pawn.BLACK) > stateB.getNumberOf(State.Pawn.BLACK)) {
-            eval += 10;
-
+        if (state.getTurn().equalsTurn("WW")) {
+            utility += 1000;
         }
 
+        utility += state.getNumberOf(State.Pawn.WHITE) * 16;
 
-        return eval;
+        utility -= state.getNumberOf(State.Pawn.BLACK) * 9;
+
+        System.out.println("Evaluation = " + utility + " W = " +
+                state.getNumberOf(State.Pawn.WHITE) + " B = " +
+                state.getNumberOf(State.Pawn.BLACK));
+
+
+        return utility;
+
+
+    }
+
+    public int blackEvaluation(State state) {
+        int utility = 0;
+
+        if (state.getTurn().equalsTurn("BW")) {
+            utility += 1000;
+        }
+
+        utility -= state.getNumberOf(State.Pawn.WHITE) * 16;
+
+        utility += state.getNumberOf(State.Pawn.BLACK) * 9;
+
+
+
+
+
+
+        return utility;
 
 
     }
@@ -177,7 +203,7 @@ public class TablutBasicClient extends TablutClient {
 
 
 
-                    int i = 0;
+                    /*int i = 0;
                     while (i < empty.size() && !found) {
                         String from = this.getCurrentState().getBox(king[0], king[1]);
                         System.out.println("trying to move king from " + king[0] + ", " + king[1] + " type: " + state.getPawn(king[0], king[1]).toString());
@@ -202,61 +228,61 @@ public class TablutBasicClient extends TablutClient {
                         }
                         System.out.println(i);
                         i++;
-                    }
+                    }*/
 
 
 
                     int[] selected = null;
                     Map<Action, Integer> evalMoves = new HashMap<Action, Integer>();
 
-                    if (!found) {
-                        while (pawns.size() > 0) {
-                            if (pawns.size() > 1) {
-                                selected = pawns.remove(new Random().nextInt(pawns.size() - 1));
-                            } else {
-                                selected = pawns.remove(0);
+
+                    while (pawns.size() > 0) {
+                        if (pawns.size() > 1) {
+                            selected = pawns.remove(new Random().nextInt(pawns.size() - 1));
+                        } else {
+                            selected = pawns.remove(0);
+                        }
+
+
+                        String from = this.getCurrentState().getBox(selected[0], selected[1]);
+
+                        for (int k = 0; k < empty.size(); k++) {
+                            selected = empty.get(k);
+                            String to = this.getCurrentState().getBox(selected[0], selected[1]);
+
+                            try {
+                                a = new Action(from, to, State.Turn.WHITE);
+                            } catch (IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
                             }
-
-
-                            String from = this.getCurrentState().getBox(selected[0], selected[1]);
-
-                            for (int k = 0; k < empty.size(); k++) {
-                                selected = empty.get(k);
-                                String to = this.getCurrentState().getBox(selected[0], selected[1]);
-
-                                try {
-                                    a = new Action(from, to, State.Turn.WHITE);
-                                } catch (IOException e1) {
-                                    // TODO Auto-generated catch block
-                                    e1.printStackTrace();
-                                }
-                                int score = 0;
-                                try {
-                                    State possibleState = rules.checkMove(state.clone(), a);
-                                    score = evaluation(state, possibleState);
-                                    evalMoves.put(a, score);
-                                } catch (Exception e) {
-
-                                }
-
+                            int score = 0;
+                            try {
+                                State possibleState = rules.checkMove(state.clone(), a);
+                                score = whiteEvaluation(possibleState);
+                                evalMoves.put(a, score);
+                            } catch (Exception e) {
 
                             }
 
 
                         }
 
-                        Map<Action, Integer> sorted = evalMoves
-                                .entrySet()
-                                .stream()
-                                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                                .collect(
-                                        toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
-                                                LinkedHashMap::new));
 
-                        a = sorted.entrySet().iterator().next().getKey();
-
-                        System.out.println("My move has evaluation = " + sorted.get(a));
                     }
+
+                    Map<Action, Integer> sorted = evalMoves
+                            .entrySet()
+                            .stream()
+                            .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                            .collect(
+                                    toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                                            LinkedHashMap::new));
+
+                    a = sorted.entrySet().iterator().next().getKey();
+
+                    System.out.println("My move has evaluation = " + sorted.get(a));
+
 
 
                     System.out.println("Mossa scelta: " + a.toString());
@@ -311,34 +337,65 @@ public class TablutBasicClient extends TablutClient {
                         }
                     }
 
-                    int[] selected = null;
-
                     boolean found = false;
                     Action a = null;
+                    try {
+                        a = new Action("z0", "z0", State.Turn.WHITE);
+                    } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
 
-                    while (!found) {
-                        selected = pawns.get(new Random().nextInt(pawns.size() - 1));
+                    int[] selected = null;
+                    Map<Action, Integer> evalMoves = new HashMap<Action, Integer>();
+
+
+                    while (pawns.size() > 0) {
+                        if (pawns.size() > 1) {
+                            selected = pawns.remove(new Random().nextInt(pawns.size() - 1));
+                        } else {
+                            selected = pawns.remove(0);
+                        }
+
+
                         String from = this.getCurrentState().getBox(selected[0], selected[1]);
 
-                        selected = empty.get(new Random().nextInt(empty.size() - 1));
-                        String to = this.getCurrentState().getBox(selected[0], selected[1]);
+                        for (int k = 0; k < empty.size(); k++) {
+                            selected = empty.get(k);
+                            String to = this.getCurrentState().getBox(selected[0], selected[1]);
 
-                        try {
-                            a = new Action(from, to, State.Turn.BLACK);
-                        } catch (IOException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
+                            try {
+                                a = new Action(from, to, State.Turn.WHITE);
+                            } catch (IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                            int score = 0;
+                            try {
+                                State possibleState = rules.checkMove(state.clone(), a);
+                                score = blackEvaluation(possibleState);
+                                evalMoves.put(a, score);
+                            } catch (Exception e) {
+
+                            }
+
+
                         }
 
-                        System.out.println("try: " + a.toString());
-                        try {
-                            rules.checkMove(state, a);
-                            found = true;
-                        } catch (Exception e) {
-
-                        }
 
                     }
+
+                    Map<Action, Integer> sorted = evalMoves
+                            .entrySet()
+                            .stream()
+                            .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                            .collect(
+                                    toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                                            LinkedHashMap::new));
+
+                    a = sorted.entrySet().iterator().next().getKey();
+
+                    System.out.println("My move has evaluation = " + sorted.get(a));
 
                     System.out.println("Mossa scelta: " + a.toString());
                     try {
