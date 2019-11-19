@@ -12,18 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-final class BasicWhiteStrategy{
-    private static int maxDepth;
+final class MinimaxStrategy {
 
 
-    private BasicWhiteStrategy() {
-        maxDepth = 4;
+    private MinimaxStrategy() {
+
     }
-
-    public static int getMaxDepth() {
-        return maxDepth;
-    }
-
 
 
     public static int final_eval(State state, boolean isWhiteturn) {
@@ -31,6 +25,10 @@ final class BasicWhiteStrategy{
         if (isWhiteturn) {
             if (state.getTurn().equalsTurn("WW")) {
                 utility += 1000;
+                return utility;
+            } else if (state.getTurn().equalsTurn("BW")) {
+                utility -= 1000;
+                return utility;
             }
 
             utility += state.getNumberOf(State.Pawn.WHITE) * 16;
@@ -44,6 +42,10 @@ final class BasicWhiteStrategy{
         } else {
             if (state.getTurn().equalsTurn("BW")) {
                 utility += 1000;
+                return utility;
+            } else if (state.getTurn().equalsTurn("WW")) {
+                utility -= 1000;
+                return utility;
             }
 
             utility -= state.getNumberOf(State.Pawn.WHITE) * 16;
@@ -63,9 +65,10 @@ final class BasicWhiteStrategy{
 
     private static Pair<Action, Integer> minimax(State state, int currentDepth, boolean isMax, Game rules, boolean isWhiteTurn, int alpha, int beta) {
 
-        if (currentDepth == 0 /*or is terminal*/) {
+        if (currentDepth == 0 || state.getTurn().equalsTurn("WW") ||
+                state.getTurn().equalsTurn("BW")) {
 
-            return new Pair<>(null, final_eval(state, isWhiteTurn));
+            return new Pair<>(null, final_eval(state, !isWhiteTurn));
         }
 
         List<int[]> pawns = new ArrayList<>();
@@ -142,6 +145,7 @@ final class BasicWhiteStrategy{
                     a = action;
                     alpha = Math.max(alpha, bestValue);
                     if (beta <= alpha) {
+                        System.out.println("PRUNING");
                         break;
                     }
                 } else if (!isMax && bestValue > child.getValue()) {
@@ -149,6 +153,7 @@ final class BasicWhiteStrategy{
                     a = action;
                     beta = Math.min(beta, bestValue);
                     if (beta <= alpha) {
+                        System.out.println("PRUNING");
                         break;
                     }
                 }

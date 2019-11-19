@@ -2,7 +2,6 @@ package it.unibo.ai.didattica.competition.tablut.client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.*;
 
 import it.unibo.ai.didattica.competition.tablut.domain.*;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
@@ -107,11 +106,9 @@ public class TablutBasicClient extends TablutClient {
                 e1.printStackTrace();
                 System.exit(1);
             }
-            System.out.println("Current state:");
-            System.out.println("Current state:");
             state = this.getCurrentState();
-            System.out.println(state.toString());
-            System.out.println(state.getPawn(4, 4).toString());
+            //System.out.println(state.toString());
+            //System.out.println(state.getPawn(4, 4).toString());
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -121,7 +118,7 @@ public class TablutBasicClient extends TablutClient {
                 if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
 
 
-                    Action a = BasicWhiteStrategy.chooseAction(state, rules, true, 3);
+                    Action a = MinimaxStrategy.chooseAction(state, rules, true, 3);
 
                     System.out.println("Mossa scelta: " + a.toString());
                     try {
@@ -156,7 +153,7 @@ public class TablutBasicClient extends TablutClient {
             } else {
                 if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
 
-                    Action a = BasicWhiteStrategy.chooseAction(state, rules, false, 3);
+                    Action a = MinimaxStrategy.chooseAction(state, rules, false, 2);
 
                     System.out.println("Mossa scelta: " + a.toString());
                     try {
