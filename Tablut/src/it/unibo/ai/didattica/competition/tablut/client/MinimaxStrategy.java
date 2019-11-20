@@ -35,22 +35,22 @@ final class MinimaxStrategy {
 
             utility -= state.getNumberOf(State.Pawn.BLACK) * 9;
 
-            System.out.println("Evaluation = " + utility + " W = " +
-                    state.getNumberOf(State.Pawn.WHITE) + " B = " +
-                    state.getNumberOf(State.Pawn.BLACK));
+            //System.out.println("Evaluation = " + utility + " W = " +
+            //        state.getNumberOf(State.Pawn.WHITE) + " B = " +
+              //      state.getNumberOf(State.Pawn.BLACK));
 
         } else {
             if (state.getTurn().equalsTurn("BW")) {
-                utility += 1000;
+                utility -= 1000;
                 return utility;
             } else if (state.getTurn().equalsTurn("WW")) {
-                utility -= 1000;
+                utility += 1000;
                 return utility;
             }
 
-            utility -= state.getNumberOf(State.Pawn.WHITE) * 16;
+            utility += state.getNumberOf(State.Pawn.WHITE) * 16;
 
-            utility += state.getNumberOf(State.Pawn.BLACK) * 9;
+            utility -= state.getNumberOf(State.Pawn.BLACK) * 9;
         }
         return utility;
 
@@ -58,7 +58,7 @@ final class MinimaxStrategy {
 
     public static Action chooseAction(State state, Game rules, boolean isWhiteTurn, int maxDepth) {
         //ArrayList<Action> possibleActions = getPossibleActions(state, rules, pawns, empty, turn);
-        Pair<Action, Integer> bestAction = minimax(state, maxDepth, true, rules, isWhiteTurn, -999999, 999999);
+        Pair<Action, Integer> bestAction = minimax(state, maxDepth, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
         System.out.println("best action eval: " + bestAction.getValue());
 
         return bestAction.getKey();
