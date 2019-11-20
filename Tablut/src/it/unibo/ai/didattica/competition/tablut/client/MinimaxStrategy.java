@@ -20,9 +20,9 @@ final class MinimaxStrategy {
     }
 
 
-    public static int final_eval(State state, boolean isWhiteturn) {
+    public static int final_eval(State state, boolean isWhiteTurn) {
         int utility = 0;
-        if (isWhiteturn) {
+        if (isWhiteTurn) {
             if (state.getTurn().equalsTurn("WW")) {
                 utility += 1000;
                 return utility;
@@ -59,16 +59,23 @@ final class MinimaxStrategy {
     public static Action chooseAction(State state, Game rules, boolean isWhiteTurn, int maxDepth) {
         //ArrayList<Action> possibleActions = getPossibleActions(state, rules, pawns, empty, turn);
         Pair<Action, Integer> bestAction = minimax(state, maxDepth, true, rules, isWhiteTurn, -999999, 999999);
+        System.out.println("best action eval: " + bestAction.getValue());
 
         return bestAction.getKey();
     }
 
     private static Pair<Action, Integer> minimax(State state, int currentDepth, boolean isMax, Game rules, boolean isWhiteTurn, int alpha, int beta) {
 
-        if (currentDepth == 0 || state.getTurn().equalsTurn("WW") ||
-                state.getTurn().equalsTurn("BW")) {
+        if (currentDepth == 0 || state.getTurn().equals(StateTablut.Turn.WHITEWIN) ||
+                state.getTurn().equals(StateTablut.Turn.BLACKWIN)) {
+            Pair<Action, Integer> result = new Pair<>(null, final_eval(state, !isWhiteTurn));
+            if (state.getTurn().equals(StateTablut.Turn.BLACK)) {
+                System.out.println("WHITE played - Leaf: " + result.getValue());
+            } else if (state.getTurn().equals(StateTablut.Turn.WHITE)) {
+                System.out.println("BLACK played - Leaf: " + result.getValue());
+            }
 
-            return new Pair<>(null, final_eval(state, !isWhiteTurn));
+            return result;
         }
 
         List<int[]> pawns = new ArrayList<>();
@@ -133,6 +140,7 @@ final class MinimaxStrategy {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+        System.out.println("Possible actions: " + possibleActions.size());
 
         for (Action action : possibleActions) {
             try {
@@ -143,6 +151,7 @@ final class MinimaxStrategy {
                 if (isMax && bestValue < child.getValue()) {
                     bestValue = child.getValue();
                     a = action;
+                    System.out.println("    " + a.toString() + " Value: " + bestValue + "   MAX");
                     alpha = Math.max(alpha, bestValue);
                     if (beta <= alpha) {
                         System.out.println("PRUNING");
@@ -151,6 +160,7 @@ final class MinimaxStrategy {
                 } else if (!isMax && bestValue > child.getValue()) {
                     bestValue = child.getValue();
                     a = action;
+                    System.out.println("    " + a.toString() + " Value: " + bestValue + "   min");
                     beta = Math.min(beta, bestValue);
                     if (beta <= alpha) {
                         System.out.println("PRUNING");
@@ -169,33 +179,37 @@ final class MinimaxStrategy {
     private static ArrayList<Action> getPossibleActions(State state, Game rules, List<int[]> pawns,
                                                        List<int[]> empty, StateTablut.Turn turn) {
         ArrayList<Action> possibleActions = new ArrayList<>();
-        int[] selected;
+        int[] selFrom;
+        int[] selTo;
         Action a = null;
         while (pawns.size() > 0) {
             if (pawns.size() > 1) {
-                selected = pawns.remove(new Random().nextInt(pawns.size() - 1));
+                selFrom = pawns.remove(new Random().nextInt(pawns.size() - 1));
             } else {
-                selected = pawns.remove(0);
+                selFrom = pawns.remove(0);
             }
 
 
-            String from = state.getBox(selected[0], selected[1]);
+            String from = state.getBox(selFrom[0], selFrom[1]);
 
             for (int k = 0; k < empty.size(); k++) {
-                selected = empty.get(k);
-                String to = state.getBox(selected[0], selected[1]);
+                selTo = empty.get(k);
 
-                try {
-                    a = new Action(from, to, turn);
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                try {
-                    rules.checkMove(state.clone(), a);
-                    possibleActions.add(a);
-                } catch (Exception e) {
+                if (selFrom[0] == selTo[0] || selFrom[1] == selTo[1]) {
+                    String to = state.getBox(selTo[0], selTo[1]);
 
+                    try {
+                        a = new Action(from, to, turn);
+                    } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                    try {
+                        rules.checkMove(state.clone(), a);
+                        possibleActions.add(a);
+                    } catch (Exception e) {
+
+                    }
                 }
 
             }

@@ -81,7 +81,7 @@ public class GameAshtonTablut implements Game {
 		loggGame.fine("Players:\t" + whiteName + "\tvs\t" + blackName);
 		loggGame.fine("Repeated moves allowed:\t" + repeated_moves_allowed + "\tCache:\t" + cache_size);
 		loggGame.fine("Inizio partita");
-		loggGame.fine("Stato:\n" + state.toString());
+		//loggGame.fine("Stato:\n" + state.toString());
 		drawConditions = new ArrayList<State>();
 		this.citadels = new ArrayList<String>();
 		// this.strangeCitadels = new ArrayList<String>();
@@ -284,7 +284,7 @@ public class GameAshtonTablut implements Game {
 		int trovati = 0;
 		for (State s : drawConditions) {
 
-			System.out.println(s.toString());
+			//System.out.println(s.toString());
 
 			if (s.equals(state)) {
 				// DEBUG: //
@@ -317,8 +317,8 @@ public class GameAshtonTablut implements Game {
 
 		this.loggGame.fine("Current draw cache size: " + this.drawConditions.size());
 
-		this.loggGame.fine("Stato:\n" + state.toString());
-		System.out.println("Stato:\n" + state.toString());
+		//this.loggGame.fine("Stato:\n" + state.toString());
+		//System.out.println("Stato:\n" + state.toString());
 
 		return state;
 	}
@@ -502,7 +502,7 @@ public class GameAshtonTablut implements Game {
 		// ho il re sotto
 		if (a.getRowTo() < state.getBoard().length - 2
 				&& state.getPawn(a.getRowTo() + 1, a.getColumnTo()).equalsPawn("K")) {
-			System.out.println("Ho il re sotto");
+			//System.out.println("Ho il re sotto");
 			// re sul trono
 			if (state.getBox(a.getRowTo() + 1, a.getColumnTo()).equals("e5")) {
 				if (state.getPawn(5, 4).equalsPawn("B") && state.getPawn(4, 5).equalsPawn("B")

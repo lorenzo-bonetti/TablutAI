@@ -153,7 +153,7 @@ public class TablutBasicClient extends TablutClient {
             } else {
                 if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
 
-                    Action a = MinimaxStrategy.chooseAction(state, rules, false, 2);
+                    Action a = MinimaxStrategy.chooseAction(state, rules, false, 1);
 
                     System.out.println("Mossa scelta: " + a.toString());
                     try {
