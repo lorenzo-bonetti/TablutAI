@@ -22,6 +22,11 @@ final class MinimaxStrategy {
 
     public static int final_eval(State state, boolean isWhiteTurn) {
         int utility = 0;
+        String boardString = state.boardString();
+        //System.out.println(boardString);
+        char aboveKing = boardString.charAt(boardString.indexOf("K") - 10);
+        char underKing = boardString.charAt(boardString.indexOf("K") + 10);
+
         if (isWhiteTurn) {
             if (state.getTurn().equalsTurn("WW")) {
                 utility += 1000;
@@ -29,11 +34,33 @@ final class MinimaxStrategy {
             } else if (state.getTurn().equalsTurn("BW")) {
                 utility -= 1000;
                 return utility;
+            } else if (state.getTurn().equalsTurn("D")) {
+                if (state.getNumberOf(State.Pawn.WHITE) < 5 &&
+                    state.getNumberOf(State.Pawn.BLACK) > 10) {
+                    utility += 500;
+                } else {
+                    utility -= 500;
+                }
+                return utility;
             }
 
             utility += state.getNumberOf(State.Pawn.WHITE) * 16;
+            utility += state.getNumberOf(State.Pawn.KING) * 16;
 
             utility -= state.getNumberOf(State.Pawn.BLACK) * 9;
+
+            if (boardString.contains("KB") ){
+                utility -= 1;
+            }
+            if (boardString.contains("BK") ){
+                utility -= 1;
+            }
+            if (aboveKing == 'B') {
+                utility -= 1;
+            }
+            if (underKing == 'B') {
+                utility -= 1;
+            }
 
             //System.out.println("Evaluation = " + utility + " W = " +
             //        state.getNumberOf(State.Pawn.WHITE) + " B = " +
@@ -46,9 +73,31 @@ final class MinimaxStrategy {
             } else if (state.getTurn().equalsTurn("WW")) {
                 utility += 1000;
                 return utility;
+            } else if (state.getTurn().equalsTurn("D")) {
+                if (state.getNumberOf(State.Pawn.BLACK) < 6 &&
+                        state.getNumberOf(State.Pawn.WHITE) > 4) {
+                    utility -= 500;
+                } else {
+                    utility += 500;
+                }
+                return utility;
+            }
+
+            if (boardString.contains("KB") ){
+                utility -= 1;
+            }
+            if (boardString.contains("BK") ){
+                utility -= 1;
+            }
+            if (aboveKing == 'B') {
+                utility -= 1;
+            }
+            if (underKing == 'B') {
+                utility -= 1;
             }
 
             utility += state.getNumberOf(State.Pawn.WHITE) * 16;
+            utility += state.getNumberOf(State.Pawn.KING) * 16;
 
             utility -= state.getNumberOf(State.Pawn.BLACK) * 9;
         }
@@ -58,6 +107,12 @@ final class MinimaxStrategy {
 
     public static Action chooseAction(State state, Game rules, boolean isWhiteTurn, int maxDepth) {
         //ArrayList<Action> possibleActions = getPossibleActions(state, rules, pawns, empty, turn);
+        Pair<Action, Integer> winAction = minimax(state, 1, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
+        if (winAction.getValue() == 1000 && state.getTurn().equalsTurn("W") ||
+            winAction.getValue() == -1000 && state.getTurn().equalsTurn("B")) {
+            System.out.println("can win in this move");
+            return winAction.getKey();
+        }
         Pair<Action, Integer> bestAction = minimax(state, maxDepth, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
         System.out.println("best action eval: " + bestAction.getValue());
 
@@ -69,11 +124,11 @@ final class MinimaxStrategy {
         if (currentDepth == 0 || state.getTurn().equals(StateTablut.Turn.WHITEWIN) ||
                 state.getTurn().equals(StateTablut.Turn.BLACKWIN)) {
             Pair<Action, Integer> result = new Pair<>(null, final_eval(state, !isWhiteTurn));
-            if (state.getTurn().equals(StateTablut.Turn.BLACK)) {
-                System.out.println("WHITE played - Leaf: " + result.getValue());
+            /*if (state.getTurn().equals(StateTablut.Turn.BLACK)) {
+                //System.out.println("WHITE played - Leaf: " + result.getValue());
             } else if (state.getTurn().equals(StateTablut.Turn.WHITE)) {
-                System.out.println("BLACK played - Leaf: " + result.getValue());
-            }
+                //System.out.println("BLACK played - Leaf: " + result.getValue());
+            }*/
 
             return result;
         }
@@ -140,7 +195,7 @@ final class MinimaxStrategy {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
-        System.out.println("Possible actions: " + possibleActions.size());
+        //System.out.println("Possible actions: " + possibleActions.size());
 
         for (Action action : possibleActions) {
             try {
@@ -151,19 +206,19 @@ final class MinimaxStrategy {
                 if (isMax && bestValue < child.getValue()) {
                     bestValue = child.getValue();
                     a = action;
-                    System.out.println("    " + a.toString() + " Value: " + bestValue + "   MAX");
+                    //System.out.println("    " + a.toString() + " Value: " + bestValue + "   MAX");
                     alpha = Math.max(alpha, bestValue);
                     if (beta <= alpha) {
-                        System.out.println("PRUNING");
+                      //  System.out.println("PRUNING");
                         break;
                     }
                 } else if (!isMax && bestValue > child.getValue()) {
                     bestValue = child.getValue();
                     a = action;
-                    System.out.println("    " + a.toString() + " Value: " + bestValue + "   min");
+                    //System.out.println("    " + a.toString() + " Value: " + bestValue + "   min");
                     beta = Math.min(beta, bestValue);
                     if (beta <= alpha) {
-                        System.out.println("PRUNING");
+                      //  System.out.println("PRUNING");
                         break;
                     }
                 }
