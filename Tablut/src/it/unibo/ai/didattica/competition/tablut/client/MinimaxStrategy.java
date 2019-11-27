@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ForkJoinPool;
 
 final class MinimaxStrategy {
 
@@ -106,7 +107,18 @@ final class MinimaxStrategy {
 
     }
 
+    private Action parallelMinimax(State state, Game rules, boolean isWhiteTurn, int maxDepth) {
+        Pair<Action, Integer> winAction = minimax(state, 1, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
+        if (winAction.getValue() == 1000 && state.getTurn().equalsTurn("W") ||
+                winAction.getValue() == -1000 && state.getTurn().equalsTurn("B")) {
+            System.out.println("can win in this move");
+            return winAction.getKey();
+        }
+        return ForkJoinPool.commonPool().invoke(new MinimaxThread(state, rules, isWhiteTurn, maxDepth)).getKey();
+    }
+
     public static Action chooseAction(State state, Game rules, boolean isWhiteTurn, int maxDepth) {
+
         //ArrayList<Action> possibleActions = getPossibleActions(state, rules, pawns, empty, turn);
         Pair<Action, Integer> winAction = minimax(state, 1, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
         if (winAction.getValue() == 1000 && state.getTurn().equalsTurn("W") ||
