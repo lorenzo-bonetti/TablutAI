@@ -29,6 +29,7 @@ final class MinimaxStrategy {
 
         if (isWhiteTurn) {
             if (state.getTurn().equalsTurn("WW")) {
+                System.out.println("White can win");
                 utility += 1000;
                 return utility;
             } else if (state.getTurn().equalsTurn("BW")) {
@@ -121,8 +122,8 @@ final class MinimaxStrategy {
 
     private static Pair<Action, Integer> minimax(State state, int currentDepth, boolean isMax, Game rules, boolean isWhiteTurn, int alpha, int beta) {
 
-        if (currentDepth == 0 || state.getTurn().equals(StateTablut.Turn.WHITEWIN) ||
-                state.getTurn().equals(StateTablut.Turn.BLACKWIN)) {
+        if (currentDepth == 0 || state.getTurn().equalsTurn("WW") ||
+                state.getTurn().equalsTurn("BW")) {
             Pair<Action, Integer> result = new Pair<>(null, final_eval(state, !isWhiteTurn));
             /*if (state.getTurn().equals(StateTablut.Turn.BLACK)) {
                 //System.out.println("WHITE played - Leaf: " + result.getValue());
@@ -200,6 +201,7 @@ final class MinimaxStrategy {
         for (Action action : possibleActions) {
             try {
                 State nextState = rules.checkMove(state.clone(), action);
+                System.out.println(action.toString());
                 Pair<Action, Integer> child = minimax(nextState, currentDepth-1, !isMax, rules, !isWhiteTurn,
                         alpha, beta);
 
@@ -253,6 +255,7 @@ final class MinimaxStrategy {
                 if (selFrom[0] == selTo[0] || selFrom[1] == selTo[1]) {
                     String to = state.getBox(selTo[0], selTo[1]);
 
+
                     try {
                         a = new Action(from, to, turn);
                     } catch (IOException e1) {
@@ -260,6 +263,7 @@ final class MinimaxStrategy {
                         e1.printStackTrace();
                     }
                     try {
+                        //System.out.println("checking move: " + a.toString());
                         rules.checkMove(state.clone(), a);
                         possibleActions.add(a);
                     } catch (Exception e) {
