@@ -23,9 +23,30 @@ final class MinimaxStrategy {
     public static int final_eval(State state, boolean isWhiteTurn) {
         int utility = 0;
         String boardString = state.boardString();
-        //System.out.println(boardString);
         char aboveKing = boardString.charAt(boardString.indexOf("K") - 10);
         char underKing = boardString.charAt(boardString.indexOf("K") + 10);
+        String underKingRow1 = boardString.substring(50,59);
+        String underKingRow2 = boardString.substring(60,69);
+        String aboveKingRow1 = boardString.substring(30,39);
+        String aboveKingRow2 = boardString.substring(20,29);
+        StringBuilder sbLeft1 = new StringBuilder();
+        StringBuilder sbLeft2 = new StringBuilder();
+        StringBuilder sbRight1 = new StringBuilder();
+        StringBuilder sbRight2 = new StringBuilder();
+
+        String emptyRowColumn = "OOOOOOOOO";
+
+        for(int i=0;i<90;i=i+10) {
+            sbLeft1.append(boardString.charAt(i + 3));
+            sbLeft2.append(boardString.charAt(i + 2));
+            sbRight1.append(boardString.charAt(i + 5));
+            sbRight2.append(boardString.charAt(i + 6));
+        }
+
+        String leftKingColumn1 = sbLeft1.toString();
+        String leftKingColumn2 = sbLeft2.toString();
+        String rightKingColumn1 = sbRight1.toString();
+        String rightKingColumn2 = sbRight2.toString();
 
         if (isWhiteTurn) {
             if (state.getTurn().equalsTurn("WW")) {
@@ -45,22 +66,54 @@ final class MinimaxStrategy {
                 return utility;
             }
 
-            utility += state.getNumberOf(State.Pawn.WHITE) * 16;
-            utility += state.getNumberOf(State.Pawn.KING) * 16;
+            utility += state.getNumberOf(State.Pawn.WHITE) * 10;
+            utility += state.getNumberOf(State.Pawn.KING) * 10;
 
-            utility -= state.getNumberOf(State.Pawn.BLACK) * 9;
+            utility -= state.getNumberOf(State.Pawn.BLACK) * 10;
 
             if (boardString.contains("KB") ){
-                utility -= 1;
+                utility -= 5;
             }
             if (boardString.contains("BK") ){
-                utility -= 1;
+                utility -= 5;
             }
             if (aboveKing == 'B') {
-                utility -= 1;
+                utility -= 5;
             }
             if (underKing == 'B') {
-                utility -= 1;
+                utility -= 5;
+            }
+            if (aboveKingRow1.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (aboveKingRow2.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (underKingRow1.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (underKingRow2.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (leftKingColumn1.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (leftKingColumn2.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (rightKingColumn1.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (rightKingColumn2.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
             }
 
             //System.out.println("Evaluation = " + utility + " W = " +
@@ -85,22 +138,54 @@ final class MinimaxStrategy {
             }
 
             if (boardString.contains("KB") ){
-                utility -= 1;
+                utility -= 5;
             }
             if (boardString.contains("BK") ){
-                utility -= 1;
+                utility -= 5;
             }
             if (aboveKing == 'B') {
-                utility -= 1;
+                utility -= 5;
             }
             if (underKing == 'B') {
-                utility -= 1;
+                utility -= 5;
+            }
+            if (aboveKingRow1.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (aboveKingRow2.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (underKingRow1.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (underKingRow2.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (leftKingColumn1.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (leftKingColumn2.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (rightKingColumn1.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
+            }
+            if (rightKingColumn2.equals(emptyRowColumn)) {
+                utility += 10;
+                System.out.println("Empty row or line!!!!!!");
             }
 
-            utility += state.getNumberOf(State.Pawn.WHITE) * 16;
-            utility += state.getNumberOf(State.Pawn.KING) * 16;
+            utility += state.getNumberOf(State.Pawn.WHITE) * 10;
+            utility += state.getNumberOf(State.Pawn.KING) * 10;
 
-            utility -= state.getNumberOf(State.Pawn.BLACK) * 9;
+            utility -= state.getNumberOf(State.Pawn.BLACK) * 10;
         }
         return utility;
 
@@ -201,7 +286,7 @@ final class MinimaxStrategy {
         for (Action action : possibleActions) {
             try {
                 State nextState = rules.checkMove(state.clone(), action);
-                System.out.println(action.toString());
+                //System.out.println(action.toString());
                 Pair<Action, Integer> child = minimax(nextState, currentDepth-1, !isMax, rules, !isWhiteTurn,
                         alpha, beta);
 
