@@ -118,7 +118,7 @@ public class TablutRandomClient extends TablutClient {
 			}
 
 			if (this.getPlayer().equals(Turn.WHITE)) {
-				// è il mio turno
+				// ï¿½ il mio turno
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
 					int[] buf;
 					for (int i = 0; i < state.getBoard().length; i++) {
@@ -187,7 +187,7 @@ public class TablutRandomClient extends TablutClient {
 					empty.clear();
 
 				}
-				// è il turno dell'avversario
+				// ï¿½ il turno dell'avversario
 				else if (state.getTurn().equals(StateTablut.Turn.BLACK)) {
 					System.out.println("Waiting for your opponent move... ");
 				}
@@ -209,7 +209,7 @@ public class TablutRandomClient extends TablutClient {
 
 			} else {
 
-				// è il mio turno
+				// ï¿½ il mio turno
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
 					int[] buf;
 					for (int i = 0; i < state.getBoard().length; i++) {

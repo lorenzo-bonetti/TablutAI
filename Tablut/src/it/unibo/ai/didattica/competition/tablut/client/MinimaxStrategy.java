@@ -14,10 +14,9 @@ import java.util.Random;
 
 final class MinimaxStrategy {
 
+    //static boolean firstMove = true;
 
-    private MinimaxStrategy() {
-
-    }
+    private MinimaxStrategy() {}
 
 
     public static int final_eval(State state, boolean isWhiteTurn) {
@@ -50,7 +49,7 @@ final class MinimaxStrategy {
 
         if (isWhiteTurn) {
             if (state.getTurn().equalsTurn("WW")) {
-                System.out.println("White can win");
+                //System.out.println("White can win");
                 utility += 1000;
                 return utility;
             } else if (state.getTurn().equalsTurn("BW")) {
@@ -66,10 +65,10 @@ final class MinimaxStrategy {
                 return utility;
             }
 
-            utility += state.getNumberOf(State.Pawn.WHITE) * 10;
-            utility += state.getNumberOf(State.Pawn.KING) * 10;
+            utility += state.getNumberOf(State.Pawn.WHITE) * 50;
+            utility += state.getNumberOf(State.Pawn.KING) * 50;
 
-            utility -= state.getNumberOf(State.Pawn.BLACK) * 10;
+            utility -= state.getNumberOf(State.Pawn.BLACK) * 50;
 
             if (boardString.contains("KB") ){
                 utility -= 5;
@@ -83,37 +82,42 @@ final class MinimaxStrategy {
             if (underKing == 'B') {
                 utility -= 5;
             }
-            if (aboveKingRow1.equals(emptyRowColumn)) {
+
+            /*if (aboveKingRow1.equals(emptyRowColumn)) {
+                utility += 3;
+            }*/
+            if (aboveKingRow2.contains("K") && !aboveKingRow2.contains("B")) {
                 utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                if (!aboveKingRow2.contains("W")){
+                    utility+= 500;
+                }
             }
-            if (aboveKingRow2.equals(emptyRowColumn)) {
+            /*if (underKingRow1.equals(emptyRowColumn)) {
+                utility += 3;
+            }*/
+            if (underKingRow2.contains("K") && !underKingRow2.contains("B")) {
                 utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                if (!underKingRow2.contains("W")){
+                    utility+= 500;
+                }
             }
-            if (underKingRow1.equals(emptyRowColumn)) {
+            /*if (leftKingColumn1.equals(emptyRowColumn)) {
+                utility += 3;
+            }*/
+            if (leftKingColumn2.contains("K") && !leftKingColumn2.contains("B")) {
                 utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                if (!leftKingColumn2.contains("W")){
+                    utility+= 500;
+                }
             }
-            if (underKingRow2.equals(emptyRowColumn)) {
+            /*if (rightKingColumn1.equals(emptyRowColumn)) {
+                utility += 3;
+            }*/
+            if (rightKingColumn2.contains("K") && !rightKingColumn2.contains("B")) {
                 utility += 10;
-                System.out.println("Empty row or line!!!!!!");
-            }
-            if (leftKingColumn1.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
-            }
-            if (leftKingColumn2.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
-            }
-            if (rightKingColumn1.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
-            }
-            if (rightKingColumn2.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                if (!rightKingColumn2.contains("W")){
+                    utility+= 500;
+                }
             }
 
             //System.out.println("Evaluation = " + utility + " W = " +
@@ -150,55 +154,57 @@ final class MinimaxStrategy {
                 utility -= 5;
             }
             if (aboveKingRow1.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                utility += 3;
             }
             if (aboveKingRow2.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                utility += 3;
             }
             if (underKingRow1.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                utility += 3;
             }
             if (underKingRow2.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                utility += 3;
             }
             if (leftKingColumn1.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                utility += 3;
             }
             if (leftKingColumn2.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                utility += 3;
             }
             if (rightKingColumn1.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                utility += 3;
             }
             if (rightKingColumn2.equals(emptyRowColumn)) {
-                utility += 10;
-                System.out.println("Empty row or line!!!!!!");
+                utility += 3;
             }
 
-            utility += state.getNumberOf(State.Pawn.WHITE) * 10;
-            utility += state.getNumberOf(State.Pawn.KING) * 10;
+            utility += state.getNumberOf(State.Pawn.WHITE) * 50;
+            utility += state.getNumberOf(State.Pawn.KING) * 50;
 
-            utility -= state.getNumberOf(State.Pawn.BLACK) * 10;
+            utility -= state.getNumberOf(State.Pawn.BLACK) * 50;
         }
         return utility;
 
     }
 
     public static Action chooseAction(State state, Game rules, boolean isWhiteTurn, int maxDepth) {
+        /*if (firstMove) {
+            Pair<Action, Integer> bestAction = minimax(state, 3, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
+            firstMove = false;
+            return bestAction.getKey();
+        }*/
         //ArrayList<Action> possibleActions = getPossibleActions(state, rules, pawns, empty, turn);
         Pair<Action, Integer> winAction = minimax(state, 1, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
-        if (winAction.getValue() == 1000 && state.getTurn().equalsTurn("W") ||
-            winAction.getValue() == -1000 && state.getTurn().equalsTurn("B")) {
-            System.out.println("can win in this move");
-            return winAction.getKey();
+        try {
+            if (rules.checkMove(state.clone(), winAction.getKey()).getTurn().equalsTurn("WW") ||
+                    rules.checkMove(state.clone(), winAction.getKey()).getTurn().equalsTurn("BW")) {
+                System.out.println("can win in this move");
+                return winAction.getKey();
+            }
+        } catch (Exception e) {
+
         }
+
         Pair<Action, Integer> bestAction = minimax(state, maxDepth, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
         System.out.println("best action eval: " + bestAction.getValue());
 

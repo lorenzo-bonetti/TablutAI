@@ -6,8 +6,6 @@ import java.net.UnknownHostException;
 import it.unibo.ai.didattica.competition.tablut.domain.*;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
-import static java.util.stream.Collectors.toMap;
-
 /**
  * @author A. Piretti, Andrea Galassi
  */
@@ -15,47 +13,49 @@ public class TablutBasicClient extends TablutClient {
 
     private int game;
 
-    public TablutBasicClient(String player, String name, int gameChosen) throws UnknownHostException, IOException {
-        super(player, name);
+    public TablutBasicClient(String player, String name, int gameChosen, int timeout, String ipAddress) throws UnknownHostException, IOException {
+        super(player, name, timeout, ipAddress);
         game = gameChosen;
     }
 
     public TablutBasicClient(String player) throws UnknownHostException, IOException {
-        this(player, "random", 4);
+        this(player, "random", 4, 60, "localhost");
     }
 
     public TablutBasicClient(String player, String name) throws UnknownHostException, IOException {
-        this(player, name, 4);
+        this(player, name, 4, 60, "localhost");
     }
 
     public TablutBasicClient(String player, int gameChosen) throws UnknownHostException, IOException {
-        this(player, "random", gameChosen);
+        this(player, "random", gameChosen, 60, "localhost");
     }
-
 
 
     public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
         int gametype = 4;
         String role = "";
-        String name = "basic";
+        String name = "PickleRicks";
+        int timeout = 60;
+        String ipAddress = "localhost";
         // TODO: change the behavior?
         if (args.length < 1) {
             System.out.println("You must specify which player you are (WHITE or BLACK)");
             System.exit(-1);
         } else {
             System.out.println(args[0]);
-            role = (args[0]);
+            role = (args[0].toUpperCase());
         }
         if (args.length == 2) {
-            System.out.println(args[1]);
-            gametype = Integer.parseInt(args[1]);
+            timeout = (Integer.parseInt(args[1]));
+
         }
         if (args.length == 3) {
-            name = args[2];
+            timeout = (Integer.parseInt(args[1]));
+            ipAddress = (args[2]);
         }
         System.out.println("Selected client: " + args[0]);
 
-        TablutBasicClient client = new TablutBasicClient(role, name, gametype);
+        TablutBasicClient client = new TablutBasicClient(role, name, gametype, timeout, ipAddress);
         client.run();
     }
 
@@ -87,7 +87,7 @@ public class TablutBasicClient extends TablutClient {
             case 4:
                 state = new StateTablut();
                 state.setTurn(State.Turn.WHITE);
-                rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
+                rules = new GameSpeedTablut(99, 0, "fake", "fake");
                 System.out.println("Ashton Tablut game");
                 break;
             default:
@@ -117,10 +117,12 @@ public class TablutBasicClient extends TablutClient {
             if (this.getPlayer().equals(Turn.WHITE)) { // white turn
                 if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
 
-
-                    Action a = MinimaxStrategy.chooseAction(state, rules, true, 3);
-
+                    long startTime = System.currentTimeMillis();
+                    Action a = MinimaxStrategy.chooseAction(state, rules, true, 4);
+                    long estimatedTime = System.currentTimeMillis() - startTime;
                     System.out.println("Mossa scelta: " + a.toString());
+                    System.out.println("Time to find move: " + estimatedTime/1000.0 + " seconds");
+
                     try {
                         this.write(a);
                     } catch (ClassNotFoundException | IOException e) {
@@ -153,9 +155,13 @@ public class TablutBasicClient extends TablutClient {
             } else {
                 if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
 
-                    Action a = MinimaxStrategy.chooseAction(state, rules, false, 3);
-
+                    long startTime = System.currentTimeMillis();
+                    Action a = MinimaxStrategy.chooseAction(state, rules, false, 4);
+                    long estimatedTime = System.currentTimeMillis() - startTime;
                     System.out.println("Mossa scelta: " + a.toString());
+                    System.out.println("Time to find move: " + estimatedTime/1000.0 + " seconds");
+
+
                     try {
                         this.write(a);
                     } catch (ClassNotFoundException | IOException e) {
@@ -181,4 +187,3 @@ public class TablutBasicClient extends TablutClient {
 
     }
 }
-

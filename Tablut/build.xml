@@ -41,6 +41,14 @@
             </classpath>
         </java>
     </target>
+    <target name="AIplayer">
+        <java classname="it.unibo.ai.didattica.competition.tablut.client.TablutBasicClient" fork="true">
+            <classpath>
+                <pathelement location="lib/gson-2.2.2.jar"/>
+                <pathelement location="build"/>
+            </classpath>
+        </java>
+    </target>
 
 
 
