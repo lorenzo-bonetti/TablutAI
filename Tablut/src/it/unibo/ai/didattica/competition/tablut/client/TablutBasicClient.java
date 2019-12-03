@@ -117,8 +117,13 @@ public class TablutBasicClient extends TablutClient {
             if (this.getPlayer().equals(Turn.WHITE)) { // white turn
                 if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
 
+                    long startTime = System.currentTimeMillis();
+                    Action a = MinimaxStrategy.parallelMinimax(state, rules, true, 4);
+                    long estimatedTime = System.currentTimeMillis() - startTime;
+                    System.out.println("Time to find move: " + estimatedTime/1000 + "seconds");
 
-                    Action a = MinimaxStrategy.chooseAction(state, rules, true, 1);
+
+
 
                     System.out.println("Mossa scelta: " + a.toString());
                     try {
@@ -153,7 +158,10 @@ public class TablutBasicClient extends TablutClient {
             } else {
                 if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
 
-                    Action a = MinimaxStrategy.chooseAction(state, rules, false, 1);
+                    long startTime = System.currentTimeMillis();
+                    Action a = MinimaxStrategy.chooseAction(state, rules, false, 4);
+                    long estimatedTime = System.currentTimeMillis() - startTime;
+                    System.out.println("Time to find move: " + estimatedTime/1000 + "seconds");
 
                     System.out.println("Mossa scelta: " + a.toString());
                     try {

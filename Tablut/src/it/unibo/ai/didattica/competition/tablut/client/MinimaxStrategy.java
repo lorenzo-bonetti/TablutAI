@@ -20,6 +20,9 @@ final class MinimaxStrategy {
 
     }
 
+    public static ForkJoinPool forkJoinPool = new ForkJoinPool(1);
+
+
 
     public static int final_eval(State state, boolean isWhiteTurn) {
         int utility = 0;
@@ -107,14 +110,18 @@ final class MinimaxStrategy {
 
     }
 
-    private Action parallelMinimax(State state, Game rules, boolean isWhiteTurn, int maxDepth) {
+    public static Action parallelMinimax(State state, Game rules, boolean isWhiteTurn, int maxDepth) {
+        System.out.println("CPU Core: " + Runtime.getRuntime().availableProcessors());
+        System.out.println("CommonPool Parallelism: " + forkJoinPool.getParallelism());
+        System.out.println("CommonPool Common Parallelism: " + forkJoinPool.getParallelism());
         Pair<Action, Integer> winAction = minimax(state, 1, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
+        System.out.println("first check for win: " + winAction.getValue());
         if (winAction.getValue() == 1000 && state.getTurn().equalsTurn("W") ||
                 winAction.getValue() == -1000 && state.getTurn().equalsTurn("B")) {
             System.out.println("can win in this move");
             return winAction.getKey();
         }
-        return ForkJoinPool.commonPool().invoke(new MinimaxThread(state, rules, isWhiteTurn, maxDepth)).getKey();
+        return forkJoinPool.invoke(new MinimaxThread(state, rules, isWhiteTurn, maxDepth, -999999, 999999)).getKey();
     }
 
     public static Action chooseAction(State state, Game rules, boolean isWhiteTurn, int maxDepth) {
@@ -132,7 +139,7 @@ final class MinimaxStrategy {
         return bestAction.getKey();
     }
 
-    private static Pair<Action, Integer> minimax(State state, int currentDepth, boolean isMax, Game rules, boolean isWhiteTurn, int alpha, int beta) {
+    public static Pair<Action, Integer> minimax(State state, int currentDepth, boolean isMax, Game rules, boolean isWhiteTurn, int alpha, int beta) {
 
         if (currentDepth == 0 || state.getTurn().equalsTurn("WW") ||
                 state.getTurn().equalsTurn("BW")) {
@@ -213,7 +220,7 @@ final class MinimaxStrategy {
         for (Action action : possibleActions) {
             try {
                 State nextState = rules.checkMove(state.clone(), action);
-                System.out.println(action.toString());
+                //System.out.println(action.toString());
                 Pair<Action, Integer> child = minimax(nextState, currentDepth-1, !isMax, rules, !isWhiteTurn,
                         alpha, beta);
 
@@ -245,7 +252,7 @@ final class MinimaxStrategy {
 
     }
 
-    private static ArrayList<Action> getPossibleActions(State state, Game rules, List<int[]> pawns,
+    public static ArrayList<Action> getPossibleActions(State state, Game rules, List<int[]> pawns,
                                                        List<int[]> empty, StateTablut.Turn turn) {
         ArrayList<Action> possibleActions = new ArrayList<>();
         int[] selFrom;
