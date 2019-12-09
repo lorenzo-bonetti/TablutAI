@@ -4,8 +4,6 @@ import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
-import javafx.util.Pair;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -194,7 +192,7 @@ final class MinimaxStrategy {
             return bestAction.getKey();
         }*/
         //ArrayList<Action> possibleActions = getPossibleActions(state, rules, pawns, empty, turn);
-        Pair<Action, Integer> winAction = minimax(state, 1, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
+        CustomPair winAction = minimax(state, 1, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
         try {
             if (rules.checkMove(state.clone(), winAction.getKey()).getTurn().equalsTurn("WW") ||
                     rules.checkMove(state.clone(), winAction.getKey()).getTurn().equalsTurn("BW")) {
@@ -205,17 +203,17 @@ final class MinimaxStrategy {
 
         }
 
-        Pair<Action, Integer> bestAction = minimax(state, maxDepth, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
+        CustomPair bestAction = minimax(state, maxDepth, isWhiteTurn, rules, isWhiteTurn, -999999, 999999);
         System.out.println("best action eval: " + bestAction.getValue());
 
         return bestAction.getKey();
     }
 
-    private static Pair<Action, Integer> minimax(State state, int currentDepth, boolean isMax, Game rules, boolean isWhiteTurn, int alpha, int beta) {
+    private static CustomPair minimax(State state, int currentDepth, boolean isMax, Game rules, boolean isWhiteTurn, int alpha, int beta) {
 
         if (currentDepth == 0 || state.getTurn().equalsTurn("WW") ||
                 state.getTurn().equalsTurn("BW")) {
-            Pair<Action, Integer> result = new Pair<>(null, final_eval(state, !isWhiteTurn));
+            CustomPair result = new CustomPair(null, final_eval(state, !isWhiteTurn));
             /*if (state.getTurn().equals(StateTablut.Turn.BLACK)) {
                 //System.out.println("WHITE played - Leaf: " + result.getValue());
             } else if (state.getTurn().equals(StateTablut.Turn.WHITE)) {
@@ -293,7 +291,7 @@ final class MinimaxStrategy {
             try {
                 State nextState = rules.checkMove(state.clone(), action);
                 //System.out.println(action.toString());
-                Pair<Action, Integer> child = minimax(nextState, currentDepth-1, !isMax, rules, !isWhiteTurn,
+                CustomPair child = minimax(nextState, currentDepth-1, !isMax, rules, !isWhiteTurn,
                         alpha, beta);
 
                 if (isMax && bestValue < child.getValue()) {
@@ -320,7 +318,7 @@ final class MinimaxStrategy {
             }
 
         }
-        return new Pair<>(a, bestValue);
+        return new CustomPair(a, bestValue);
 
     }
 
